@@ -1,0 +1,141 @@
+body {
+  font-family: Arial, sans-serif;
+}
+
+header {
+  background-image: url('assets/images/plant_background.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+footer {
+  background-color: #f8f9fa;
+}
+
+/* Header compact */
+header.bg-success {
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+}
+
+/* Carousel adjustments */
+.carousel-container {
+  overflow: hidden;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+.navbar-brand {
+  font-size: 1rem;          /* same as nav-link */
+  font-weight: 400;         /* normal weight */
+  color: rgba(0, 0, 0, 0.55);
+  padding: 0.5rem 0.5rem;
+}
+
+.navbar-brand:hover {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+/* Make the hamburger icon smaller on small screens */
+@media (max-width: 991.98px) {
+  .navbar-toggler {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .navbar-toggler-icon {
+    width: 1.2em;
+    height: 1.2em;
+  }
+}
+
+.image-carousel {
+  overflow: hidden;
+  width: 90%;
+  position: relative;
+}
+
+.carousel-img {
+  flex: 0 0 33.33%;
+  transition: transform 0.8s ease-in-out, opacity 0.8s;  /* UPDATED */
+  opacity: 0.6;
+  padding: 5px;
+  height: 300px;
+  width: 100%;
+  object-fit: cover;
+  pointer-events: auto;
+  object-position: center;
+  border-radius: 8px;
+  transform: scale(0.9); /* Ensure consistent starting size */
+}
+
+/* Each slide (the link) is a flex item */
+.carousel-slide {
+  flex: 0 0 33.33%;
+  display: block;
+  position: relative;
+  text-decoration: none;
+}
+
+.carousel-track {
+  display: flex;
+  height: 300px;
+  align-items: center;
+  transition: transform 0.8s ease-in-out;  /* NEW */
+  pointer-events: auto;
+}
+
+.carousel-img.active {
+  transform: scale(1.1);
+  opacity: 1;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+.research-detail {
+  padding-top: 15px;
+  display: none; /* Hidden by default, JS shows the active one */
+}
+.research-detail.active {
+  display: flex !important;
+}
+
+.research-text {
+  font-size: 0.88rem; /* Smaller text */
+  text-align: justify; /* Align both left and right */
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.bold-list {
+  padding-left: 1.2rem;
+}
+
+.bold-list li {
+  font-size: 0.88rem; /* Match paragraph size */
+  font-weight: bold;
+  text-align: justify; /* Also justify list items */
+}
+
+.research-slide {
+  max-height: 450px;
+  object-fit: cover;
+  transition: opacity 0.5s ease-in-out;
+}
+
+
+.publication {
+  margin-bottom: 1.5rem;
+  margin-left: 1.5rem;
+}
+
+.pub-title {
+  font-size: 1.1rem;
+  margin-bottom: 0.2rem;
+}
+
+.pub-authors, .pub-details {
+  margin: 0;
+  font-size: 0.95rem;
+}

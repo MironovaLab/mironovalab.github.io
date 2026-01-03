@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Research | Plant Developmental Regulomics</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css"
+</head>
+
+<body>
+  
+ <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">Mironova Lab</a>
+
+    <!-- Toggle button -->
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+      aria-controls="navbarNav"
+      aria-expanded="false"
+      aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="research.html">Research</a></li>
+        <li class="nav-item"><a class="nav-link" href="resources.html">Resources</a></li>
+        <li class="nav-item"><a class="nav-link" href="profile.html">Profile</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <!-- Clickable Research Cards -->
+    <div class="row text-center">
+      <div class="col-md-3"><button class="btn btn-outline-success w-100 mb-3" onclick="showSection('dev')">Plant Development</button></div>
+      <div class="col-md-3"><button class="btn btn-outline-success w-100 mb-3" onclick="showSection('singlecell')">Single Cell Analytics</button></div>
+      <div class="col-md-3"><button class="btn btn-outline-success w-100 mb-3" onclick="showSection('cisreg')">Cis-regulatory Code</button></div>
+      <div class="col-md-3"><button class="btn btn-outline-success w-100 mb-3" onclick="showSection('mathmodel')">Mathematical Modelling</button></div>
+    </div>
+
+    <!-- Detail Sections -->
+
+<div id="dev" class="research-detail row align-items-center mb-5 px-3 px-md-5">
+  <div class="col-md-6 research-text">
+    <h4>Plant Development</h4>
+    <p>Understanding how plants build and shape themselves requires insight across multiple biological scales—from gene regulatory circuits to tissue morphogenesis. In our group, we study the dynamic coordination of developmental processes in plants by integrating quantitative experimental data with predictive, multi-scale models.</p>
+    <p>A central theme in our work is bridging molecular and cellular mechanisms with tissue-scale outcomes. We develop and apply computational frameworks that link gene regulatory networks to emergent multicellular behavior. This allows us to explore how local interactions give rise to global developmental patterns, and how variability is managed across scales to ensure developmental stability and plasticity.</p>
+    <p>Our primary model system is the Arabidopsis thaliana root, which offers an ideal context to study plant development at high resolution and in real time. However, our approaches and insights are not limited to this system—we aim to uncover general principles that apply across species and organ types.</p>
+    <p>We aim to answer questions such as:</p>
+    <ul class="bold-list">
+      <li>How do cells interpret positional cues to coordinate fate and form?</li>
+      <li>How environmental conditions shape developmental patterns?</li>
+      <li>How can we predict developmental outcomes from molecular inputs?</li>
+    </ul>
+  </div>
+  
+  <div class="col-md-6">
+  <div id="dev-carousel" class="position-relative">
+    <a href="https://academic.oup.com/plphys/article-abstract/180/3/1725/6117741" target="_blank">
+      <img src="assets/images/dev1.jpg" class="img-fluid rounded research-slide" alt="Pasternak et al">
+    </a>
+    <a href="https://onlinelibrary.wiley.com/doi/full/10.1111/tpj.13720" target="_blank" class="d-none">
+      <img src="assets/images/dev2.jpg" class="img-fluid rounded research-slide" alt="Lavrekha et al">
+    </a>
+    <a href="https://www.pnas.org/doi/full/10.1073/pnas.2006620117" target="_blank" class="d-none">
+      <img src="assets/images/dev3.jpg" class="img-fluid rounded research-slide" alt="Canher et al., 2020">
+    </a>
+       <a href="https://www.pnas.org/doi/full/10.1073/pnas.2009554117" target="_blank" class="d-none">
+      <img src="assets/images/dev4.jpg" class="img-fluid rounded research-slide" alt="Freire-Rios et al., 2020">
+    </a>
+    <a href="https://academic.oup.com/plphys/article/189/4/2281/6584021" target="_blank" class="d-none">
+      <img src="assets/images/dev5.jpg" class="img-fluid rounded research-slide" alt="Xiao et al., 2022">
+    </a>
+    
+  </div>
+</div>
+</div>
+
+<div id="singlecell" class="research-detail row align-items-center mb-5 px-3 px-md-5">
+  <div class="col-md-6 research-text">
+    <h4>Single Cell Analytics</h4>
+    <p>We use single-cell technologies to gain a high-resolution view of plant development, focusing on how individual cells contribute to the coordinated behavior of tissues and organs.</p>
+    <p>Our group develops algorithms and frameworks to interpret these complex datasets to get deeper understanding of developmental processes. We are particularly interested in identifying shared regulatory signals across cell populations, resolving spatial organization from transcriptomic information.</p>
+    <p>To support the broader plant research community, we have developed the following resources:</p>
+    <ul class="bold-list">
+      <li><a href="https://rootcellatlas.org/" target="_blank">RootCellAtlas</a> – A reference atlas of Arabidopsis thaliana root that integrates and harmonizes multiple single-cell datasets enabling realistic visualization of gene expression patterns.</li>
+
+      <li><a href="https://github.com/MironovaLab/iSensors" target="_blank">iSensors</a> – An R package designed to predict hormonal levels based on single-cell transcriptomics data.</li>
+    </ul>
+  </div>
+
+  <div class="col-md-6">
+    <img src="assets/images/RCA_PIN1.jpg" class="img-fluid rounded mb-3" alt="RootCellAtlas">
+  </div>
+</div>
+
+<div id="cisreg" class="research-detail row align-items-center mb-5 px-3 px-md-5">
+  <div class="col-md-6 research-text">
+      <h4>Cis-regulatory Code</h4>
+      <p>Decoding the cis-regulatory logic of plant genomes is essential for understanding how gene expression is controlled during development. Our group focuses on uncovering how combinations of regulatory elements—composite motifs and modules—coordinate gene activity in space and time.</p>
+
+<p>We study cis-regulatory code not as isolated binding sites but as functional units embedded in dynamic regulatory networks. By integrating genomic, transcriptomic, and chromatin data, we identify motif combinations and structural features that predict gene regulation under specific developmental or environmental contexts.</p>
+
+<p>Our primary focus is on deciphering the cis-regulatory code behind auxin transcriptional response</p>
+
+<p>To support this research, we develop and maintain computational tools for regulatory element discovery and analysis, including:</p>
+<ul>
+<li><a href="https://github.com/VictoriaVMironova/metaRE" target="_blank">MetaRE</a> – a meta-analysis tool for uncovering regulatory elements consistently associated with gene expression changes across datasets.</li>
+
+<li><a href="https://plamorph.sysbio.ru/ciscross/index.html" target="_blank">CisCross</a> – a tool for comparative analysis of cis-regulatory architecture across genes, regions, or species, facilitating the study of modular regulatory organization.</li>
+</ul>
+</div>
+
+<div class="col-md-6">
+      <img src="assets/images/cisreg.jpg" class="img-fluid rounded mb-3" alt="Cis-regulatory Code">
+    </div>
+</div>
+
+<div id="mathmodel" class="research-detail row align-items-center mb-5 px-3 px-md-5">
+  <div class="col-md-6 research-text">
+      <h4>Mathematical Modelling</h4>
+      <p>Mathematical modeling is a cornerstone of our approach to understanding developmental mechanisms.</p>
+    <p>Our work focuses on tissue patterning mechanisms—how cells acquire distinct identities, organize spatially, and coordinate their actions to build functional structures. By formalizing biological hypotheses into mathematical frameworks, we can simulate developmental dynamics, test alternative mechanisms, and make quantitative predictions.</p>
+  <p>We extract quantitative spatial and temporal information from high-resolution imaging or single-cell data, which we use both to parameterize our models and to validate their predictions against real biological systems.</p>
+<p>We employ a range of modeling techniques, including:</p>
+<ul>
+  <li>Discrete and continuous models of gene regulatory networks;</li>
+  <li>Rule-based and agent-based models;</li>
+  <li>Spatial simulations of pattern formation.</li>
+</ul>
+</div>
+
+<div class="col-md-6">
+     <img src="assets/images/matmod3.jpg" class="img-fluid rounded mb-3" alt="Mathematical Modelling">
+    </div>
+  </div>
+
+  <footer class="bg-light text-center py-3" style="line-height: 1.2;">
+   <p class="mb-0">&copy; 2025 Mironova Lab</p>
+   <p class="mb-0">Radboud University, RIBES</p>
+  </footer>
+  
+  <script src="js/research.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
