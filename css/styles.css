@@ -148,3 +148,32 @@ header.bg-success {
   transform: translateY(-2px);
   transition: transform 120ms ease-in-out;
 }
+
+pre {
+  background: #fafafa;      /* light grey */
+  color: #111827;             /* near-black text */
+  padding: 0.75rem;
+  border-radius: .75rem;
+  border: 1px solid #eaeaea;
+  overflow-x: auto;
+  margin-bottom: 0.5rem;
+}
+
+pre code {
+  color: #24292f;
+  font-size: 0.82rem;
+  line-height: 1.15;
+}
+
+.code-block {
+  position: relative;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  z-index: 10;
+}
