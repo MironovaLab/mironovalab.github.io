@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Profile | Plant Developmental Regulomics</title>
+  <title>iSensors Tutorial | Mironova Lab</title>
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css"
-</head>
+  <link rel="stylesheet" href="css/styles.css">
+
 <body>
-  
- <nav class="navbar navbar-expand-lg navbar-light bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container">
     <a class="navbar-brand" href="index.html">Mironova Lab</a>
 
-    <!-- Toggle button -->
     <button
       class="navbar-toggler"
       type="button"
@@ -25,7 +25,6 @@
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <!-- Collapsible content -->
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
@@ -39,6 +38,385 @@
 
 <header class="bg-success text-white py-5">
   <div class="container text-center">
-    <h1 class="h3 mb-2">iSensor R package tutorial</h1>
+    <h1 class="h3 mb-2">iSensors R package tutorial</h1>
+    <p class="mb-0 opacity-75">scRNA-seq workflow in Seurat: scoring, visualization, and replicate-aware testing</p>
   </div>
 </header>
+
+<main class="container my-5" style="max-width: 900px;">
+<!-- Intro -->
+<section class="mb-4 section-anchor" id="intro">
+  <div class="callout">
+    <div class="row align-items-center g-4">
+
+      <!-- Logo column -->
+      <div class="col-md-2 text-center">
+        <img
+          src="assets/images/iSensors-logo.png"
+          alt="iSensors logo"
+          class="img-fluid"
+          style="max-width: 130px;">
+      </div>
+
+      <!-- Text column -->
+      <div class="col-md-10">
+        <p class="mb-2">
+          This tutorial demonstrates an end-to-end workflow to apply
+          <strong>iSensors R package</strong> to a
+          <strong>single-cell RNA-seq (scRNA-seq)</strong> dataset stored as a
+          <strong>Seurat</strong> object.
+          You will compute integrative sensors (iSensors) activity scores from predefined gene panels,
+          visualize sensor activity, and test condition effects, and develop custom iSensors panels.
+        </p>
+        <ul class="mb-0">
+          <li>Input: Seurat object (<code class="inline">seu</code>)</li>
+          <li>Metadata: sample/replicate ID (e.g., <code class="inline">orig.ident</code>) and condition labels</li>
+          <li>Output: iSensors assay(s) in the seurat object with cellular scores for the set of iSensors, figures, and a differential isensor table</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+  <!-- Table of contents -->
+  <section class="mb-5 toc section-anchor" id="toc">
+    <h2 class="h5">Contents</h2>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <ol class="mb-0">
+          <li><a href="#install">Install & load packages</a></li>
+          <li><a href="#load">Load scRNA-seq Seurat object</a></li>
+          <li><a href="#panels">Load iSensor panels</a></li>
+          <li><a href="#score">Compute iSensor scores</a></li>
+        </ol>
+      </div>
+      <div class="col-md-6">
+        <ol start="6" class="mb-0">
+          <li><a href="#viz">Visualize sensor activity</a></li>
+          <li><a href="#diff">Differential sensor activity (replicate-aware)</a></li>
+          <li><a href="#bestpractices">Best practices & common pitfalls</a></li>
+          <li><a href="#sessioninfo">Session info</a></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1) Install -->
+  <section class="mb-5 section-anchor" id="install">
+    <h2 class="h4">1) Install & load packages</h2>
+    <p class="text-muted">
+      Install iSensors from GitHub and load core dependencies. If you already have these packages, skip installation.
+    </p>
+
+  <div class="code-block position-relative">
+  <button class="btn btn-sm btn-outline-secondary copy-btn">Copy</button>
+    <pre><code class="language-r"># Core packages
+install.packages(c("Seurat", "Matrix", "tidyverse", "magrittr", "purrr", "stringr", devtools))
+
+# Bioconductor dependency used by iSensors for generating cis-sensors
+if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+BiocManager::install("Biostrings")
+
+# Install iSensors from GitHub
+devtools::install_github("MironovaLab/iSensors")
+
+library(Seurat)
+library(iSensors)
+library(tidyverse)
+</code></pre>
+</div>
+  </section>
+
+  <!-- 2) Load -->
+  <section class="mb-5 section-anchor" id="load">
+    <h2 class="h4">2) Load your scRNA-seq Seurat object</h2>
+    <p class="text-muted small">
+      Load your processed scRNA-seq Seurat object (after QC, normalization and scaling).  </p>
+
+<div class="code-block position-relative">
+  <button class="btn btn-sm btn-outline-secondary copy-btn">Copy</button>
+    <pre><code class="language-r">seurat_obj <- readRDS("path/to/your_scRNAseq_seurat.rds")
+
+DefaultAssay(seurat_obj) <- "RNA"
+DimPlot(seurat_obj)
+</code></pre>
+</div>
+  </section>
+  
+<section>
+  <p class="text-muted small">
+    In this tutorial, we explore a subset of an auxin-treated
+    <em>Arabidopsis thaliana</em> single-cell transcriptomics dataset
+    originally published in
+    <a href="https://www.cell.com/cell/abstract/S0092-8674(25)00346-0" target="_blank" rel="noopener">Martin-Arevalillo et al., 2025</a>.
+    The complete raw and processed dataset is available from
+    <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE241573" target="_blank" rel="noopener">GEO</a>.
+  </p>
+
+  <p class="text-muted small">
+    For didactic purposes, we provide a reannotated piece of the dataset for the root stem cell niche, as a lightweight reclustered
+    <a href="https://github.com/MironovaLab/iSensors-supplementary/tree/main/Tutorial-iSensors/data" target="_blank" rel="noopener">Seurat object</a>.
+    This reduced dataset is intended solely for demonstration and tutorial use.
+    Annotation quality is not guaranteed. Use this  <a href="https://github.com/MironovaLab/iSensors-supplementary/blob/main/Tutorial-iSensors/iSensors-tutorial-test-load.R" target="_blank" rel="noopener">script</a> to load the object.
+  </p>
+  
+    <img
+    src="assets/images/DimPlot_stemcellniche_auxin.png"
+    alt="Auxin-treated Arabidopsis stem cell niche (UMAP)"
+    class="img-fluid mb-3"
+    style="max-width: 650px;">
+</section>
+
+  <!-- 3) Panels -->
+  <section class="mb-5 section-anchor" id="panels">
+    <h2 class="h4">3) Load iSensors</h2>
+    <p class="text-muted small">
+      Load the gene panel set you want to score. The example below shows loading auxin-related panels for Arabidopsis. Adjust <code class="inline">species</code> and
+      <code class="inline">hormone</code> to your use case. As a negative control, three random panels of different sizes are loaded in addition to the whole genomic trend.
+    </p>
+
+<div class="code-block position-relative">
+  <button class="btn btn-sm btn-outline-secondary copy-btn">Copy</button>
+    <pre><code class="language-r">panel_set <- LoadSensors(setName = 'AuxinPanel', 
+                         species = 'AT', 
+                         hormone = 'aux', 
+                         randomInfo = list('n' = 3, 'sizes' = c(100, 200, 300), majortrend = TRUE))
+summary(panel_set$panels)</code></pre>
+</div>
+    <p class="text-muted small">
+    This command load panels available for the organism and hormone. In the test case it loads 67 iSensors, each consists of specific set of genes. Below we will discuss how to create custom iSensors
+    </p>
+    <img
+    src="assets/images/screenshot-load-panels.png"
+    alt="Screenshot-load-panels"
+    class="img-fluid mb-3"
+    style="max-width: 600px;">
+  </section>
+
+  <!-- 4) Score -->
+  <section class="mb-5 section-anchor" id="score">
+    <h2 class="h4">4) Compute iSensors</h2>
+    <p class="text-muted small">
+      Compute sensor activity scores with <code class="inline">CalcSensors()</code> function.
+    </p>
+
+<div class="code-block position-relative">
+  <button class="btn btn-sm btn-outline-secondary copy-btn">Copy</button>
+    <pre><code class="language-r">seu_is <- CalcSensors(
+  seurat_obj,
+  seurLayer = "data",
+  panelSet = panel_set,
+  signals = "mean_normed"
+)
+Assays(seu_is)</code></pre>
+
+</div>
+    <div class="callout">
+      <h3  class="text-muted small">Layer and function choice</h3>
+      <ul  class="text-muted small">
+        <li><strong>Recommended default</strong>: compute iSensors on <code class="inline">seurLayer = "data"</code> (log-normalized).</li>
+        <li>If using SCT, you can still compute sensors on RNA <code class="inline">data</code> for interpretability.</li>
+        <li>To calculate iSensors use <code class="inline">mean_normed</code> or <code class="inline">median_normed</code>, both show good results in our tests. </li>
+      </ul>
+    </div>
+    <p  class="text-muted small">
+      Tip: If you are unsure where iSensors scores are stored, inspect <code class="inline">Assays(seu_is)</code>.
+    </p>
+  </section>
+
+  <!-- 5) Visualization -->
+  <section class="mb-5 section-anchor" id="viz">
+    <h2 class="h4">5) Visualize iSensors activity</h2>
+    <p  class="text-muted small">
+    After you set <code class="inline">DefaultAssay</code> to the assay containing iSensors, you may apply standard <code class="inline">Seurat</code> functions for analytics and vizualization. 
+    </p>
+    <h3 class="h6">6.1 FeaturePlot</h3>
+    <p  class="text-muted small">
+      Select one or several iSensor feature names and visualize it on your embedding (UMAP/tSNE). In the example below we chose three iSensors, all pointing out to higher auxin levels in the initials comparing their doughters. 
+    </p>
+
+<div class="code-block position-relative">
+  <button class="btn btn-sm btn-outline-secondary copy-btn">Copy</button>
+  
+    <pre><code class="language-r"># Example: list assays and set the right one before plotting
+Assays(seu_is)
+# DefaultAssay(seu_is) <- "YOUR_ISENSORS_ASSAY"
+
+sensor_name <- "YOUR_SENSOR_NAME"
+FeaturePlot(seu_is, features = sensor_name)</code></pre>
+</div>
+    <img
+    src="assets/images/FeaturePlot_iSensors_3panels_pattern.png"
+    alt="FeaturePlot-iSensors"
+    class="img-fluid mb-3"
+    style="max-width: 800px;">
+    
+    <h3 class="h6">6.2 Dot Plot</h3>
+    <div class="code-block position-relative">
+  <button class="btn btn-sm btn-outline-secondary copy-btn">Copy</button>
+    <pre><code class="language-r">#Choose your iSensors set 
+    sensors<- c("YOUR_SENSOR_NAME1", "YOUR_SENSOR_NAME2", "YOUR_SENSOR_NAME3", ...)
+    DotPlot(seu_is, features = sensors) </code></pre></div>
+    <p  class="text-muted small">
+    The <code class="inline">DotPlot</code> below vizualizes iSensors expression in different cell types <code class="inline">group.by = "YOUR META DATA IDENT1"</code> split by condition <code class="inline">group.by = "YOUR META DATA IDENT2"</code>. The data predicts cell type specific responses to exogenous aauin, i.e., auxin syntesis is switched off in potential CEI Daughters. 
+    </p>
+  <img
+    src="assets/images/DotPlot_iSensors_celltypes_split.png"
+    alt="FeaturePlot-iSensors"
+    class="img-fluid mb-3"
+    style="max-width: 800px;">
+  </section>
+
+  <!-- 7) Differential -->
+  <section class="mb-5 section-anchor" id="diff">
+    <h2 class="h4">7) Differential iSensors activity</h2>
+    <p class="text-muted small">This section shows how to identify <strong>cell-type–specific iSensors</strong> (i.e., which sensors are enriched in one
+      <code class="inline">cluster</code> group versus others) using Seurat’s
+      <code class="inline">FindAllMarkers()</code>. Note that <code class="inline">FindAllMarkers()</code> uses per-cell tests; for replicate-aware inference, use pseudobulk models.</p>
+<div class="code-block position-relative">
+  <button class="btn btn-sm btn-outline-secondary copy-btn">Copy</button>
+  <pre class="codeblock"><code class="language-r">is_markers &lt;- FindAllMarkers(
+  object = iSensors_obj,
+  only.pos = TRUE,        # set FALSE if you also want depleted sensors
+  test.use = "wilcox",
+  logfc.threshold = 0,    # keep all; filter later
+) 
+</div>
+is_markers</code></pre>
+
+  <div class="callout mt-4">
+    <h3 class="h6 mb-2">Interpretation and caveats</h3>
+    <ul class="mb-0">
+      <li><strong>What this tests:</strong> which iSensors best distinguish <code class="inline">cluster_annot</code> groups.</li>
+      <li><strong>What this does not test:</strong> Aux vs Ctr effects within a cell type (use <code class="inline">FindMarkers()</code> per cell type or pseudobulk models).</li>
+      <li><strong>Replicates:</strong> per-cell Wilcoxon can produce very small p-values when cell counts are large; treat significance as descriptive unless you use replicate-aware statistics.</li>
+    </ul>
+  </div>
+
+</section>
+
+
+
+ <div class="code-block position-relative">
+  <button class="btn btn-sm btn-outline-secondary copy-btn">Copy</button>
+    <pre><code class="language-r"> Markers_is <- FindAllMarkers(
+    object = seu_is,
+    group.by = "orig",
+  ) </code></pre></div>
+
+    <h3 class="h6">7.2 Extract sensor values and build pseudobulk table</h3>
+
+<div class="code-block position-relative">
+  <button class="btn btn-sm btn-outline-secondary copy-btn">Copy</button>
+    <pre><code class="language-r"># Provide the sensor names you want to analyze.
+# Option 1: use a curated vector (recommended)
+sensor_vars <- c("YOUR_SENSOR_1", "YOUR_SENSOR_2")  # replace
+
+# Option 2: if you can derive names from panel_set (depends on panel_set structure)
+# sensor_vars <- names(panel_set$panels)
+
+sens <- FetchData(seu_is, vars = sensor_vars) %>%
+  tibble::rownames_to_column("cell")
+
+df <- meta %>% inner_join(sens, by = "cell")
+
+# Pseudobulk per sample (global)
+pb_global <- df %>%
+  group_by(sample_id, condition) %>%
+  summarise(
+    across(all_of(sensor_vars), ~mean(.x, na.rm = TRUE)),
+    n_cells = n(),
+    .groups = "drop"
+  ) %>%
+  filter(n_cells > 0) %>%   # important safeguard
+  pivot_longer(cols = all_of(sensor_vars), names_to = "iSensor", values_to = "score")
+
+pb_global</code></pre></div>
+
+    <h3 class="h6">7.3 Limma test on pseudobulk sensor scores</h3>
+<div class="code-block position-relative">
+  <button class="btn btn-sm btn-outline-secondary copy-btn">Copy</button>
+    <pre><code class="language-r">library(limma)
+
+# sensors x samples matrix
+E <- pb_global %>%
+  tidyr::pivot_wider(names_from = sample_id, values_from = score) %>%
+  as.data.frame()
+
+rownames(E) <- E$iSensor
+E$iSensor <- NULL
+E <- as.matrix(E)
+
+sample_meta <- pb_global %>%
+  distinct(sample_id, condition, n_cells) %>%
+  arrange(match(sample_id, colnames(E)))
+
+design <- model.matrix(~ condition, data = sample_meta)
+
+fit <- lmFit(E, design)
+fit <- eBayes(fit)
+
+res <- topTable(fit, coef = "conditionTrt", number = Inf, sort.by = "P") %>%
+  tibble::rownames_to_column("iSensor") %>%
+  as_tibble()
+
+res</code></pre></div>
+
+    <h3 class="h6">7.4 Cell-type–aware pseudobulk (optional but recommended)</h3>
+    <div class="code-block position-relative">
+  <button class="btn btn-sm btn-outline-secondary copy-btn">Copy</button>
+    <pre><code class="language-r">pb_ct <- df %>%
+  filter(!is.na(celltype)) %>%
+  group_by(sample_id, condition, celltype) %>%
+  summarise(
+    across(all_of(sensor_vars), ~mean(.x, na.rm = TRUE)),
+    n_cells = n(),
+    .groups = "drop"
+  ) %>%
+  filter(n_cells > 0) %>%
+  pivot_longer(cols = all_of(sensor_vars), names_to = "iSensor", values_to = "score")
+
+# Next steps:
+# 1) Fit within each celltype (limma per celltype), or
+# 2) Model score ~ condition + celltype (sample×celltype observations).</code></pre></div>
+  </section>
+
+  <!-- Best practices -->
+  <section class="mb-5 section-anchor" id="bestpractices">
+    <h2 class="h4">8) Best practices & common pitfalls</h2>
+
+    <ul>
+      <li><strong>Prefer replicate-aware inference</strong>: pseudobulk per sample (and per cell type) rather than per-cell p-values.</li>
+      <li><strong>Document the layer</strong> used to compute sensors (<code class="inline">data</code> vs <code class="inline">counts</code> vs SCT).</li>
+      <li><strong>Check sensor names</strong>: copy/paste can introduce Unicode dashes; use standard hyphens.</li>
+      <li><strong>Control panels</strong>: consider random panels for empirical calibration if your study emphasizes discovery.</li>
+    </ul>
+  </section>
+
+  <!-- Session info -->
+  <section class="mb-0 section-anchor" id="sessioninfo">
+    <h2 class="h4">9) Session info</h2>
+    <div class="code-block position-relative">
+  <button class="btn btn-sm btn-outline-secondary copy-btn">Copy</button>
+    <pre><code class="language-r">sessionInfo()</code></pre></div>
+  </section>
+
+</main>
+
+<script src="js/research.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.querySelectorAll(".copy-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const code = btn.nextElementSibling.querySelector("code").innerText;
+    navigator.clipboard.writeText(code).then(() => {
+      btn.textContent = "Copied!";
+      setTimeout(() => btn.textContent = "Copy", 1200);
+    });
+  });
+});
+</script>
+</body>
+</html>
